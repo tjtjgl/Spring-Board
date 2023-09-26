@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shspring.comment.CommentMapper">
+
+    <!-- comment 테이블 전체 컬럼(명시적으로 확인하기 위해) -->
+    <sql id="commentColumns">
+        id
+        , post_id
+        , content
+        , writer
+        , delete_yn
+        , created_date
+        , modified_date
+    </sql>
+
+    <!-- 댓글 저장 -->
+    <insert id="save" parameterType="com.shspring.comment.CommentRequest" useGeneratedKeys="true" keyProperty="id">
+        insert into comment(
+        <include refid="commentColumns" />
+        )
+        values (
+        #{id},
+        #{postId},
+        #{content},
+        #{writer},
+        0,
+        now(),
+        null
+        )
+
+    </insert>
+    
+    <!-- 댓글 조회 -->
+    <select id="findById" parameterType="long" resultType="com.shspring.comment.CommentResponse">
+        select
+        <include refid="commentColumns"/>
+        from comment where id = #{id}
+    </select>
+
+    <!-- 댓글 수정 -->
+    <update id="update" parameterType="com.shspring.comment.CommentRequest">
+        update comment set
+            modified_date = now(),
+            content = #{content},
+            writer = #{writer}
+        where
+            id = #{id}
+    </update>
+
+    <!-- 댓글 삭제 -->
+    <delete id="deleteById" parameterType="long">
+        update comment set
+            delete_yn = 1
+        where
+            id = #{id}
+    </delete>
+
+    <!-- 댓글 리스트 조회 -->
+    <select id="findAll" parameterType="long" resultType="com.shspring.comment.CommentResponse">
+        select * from comment
+        where
+            delete_yn = 0 AND
+            post_id = #{postId}
+        order by
+            id desc
+    </select>
+
+</mapper>
+    
